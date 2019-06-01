@@ -1,0 +1,18 @@
+{{ define "main" }}
+<main id="list">
+    <div id="posts" class="grape">
+	<div class="container">
+            <h1>{{ .Title }}</h1>
+            <ul>
+                {{ range .Data.Pages }}
+                <li>
+                    <span>{{ .Render "time-element" }}</span>
+                    <a href="{{ .URL }}">{{ .Title }}</a>
+                    
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+    </div>
+</main>
+{{ end }}

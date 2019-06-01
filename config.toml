@@ -1,0 +1,19 @@
+baseurl = "/"
+languageCode = "en-us"
+title = "Home"
+theme = "hugo-grapes"
+enableEmoji = true
+
+[permalinks]
+  post = "/posts/:slug/"
+
+[menu]
+
+  [[menu.main]]
+    identifier = "posts"
+    name = "Posts"
+    url = "/posts"
+    weight = 20
+
+[params]
+avatar = "img/grapes.svg"
