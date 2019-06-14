@@ -1,8 +1,10 @@
 ---
-title: "Review of Distributions"
-author: "边蓓蕾"
-date: "2019-06-14"
-output: html_document
+title: Review of Distributions
+author: Beilei
+date: '2019-06-14'
+slug: distributions
+categories: []
+tags: []
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - probability distributions
 - probability density function $p(z)$
 
-$P(z_{1}\leq z \leq z_{2})=\int_{z_{1}}^{z_{2}}p(x)dz$
+$$P(z_{1}\leq z \leq z_{2})=\int_{z_{1}}^{z_{2}}p(x)dz$$
 
 ### What is moment about the origin?
 
@@ -34,7 +36,7 @@ integrate(function(x) x*2*exp(-2*x), 0, Inf)
 
 #### normal distribution
 
-$p(z)=(2\pi\sigma^2)^{-1/2}exp[-\frac{(z-\mu)^2}{2\sigma^2}]$
+$$p(z)=(2\pi\sigma^2)^{-1/2}exp[-\frac{(z-\mu)^2}{2\sigma^2}]$$
 
 ```{r}
 curve(dnorm(x),
