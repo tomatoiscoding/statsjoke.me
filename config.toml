@@ -1,5 +1,6 @@
-baseurl = "/"
+baseurl = "https://statsjoke.me"
 languageCode = "en-us"
+disqusShortname = "bianbeilei"
 title = "Home"
 theme = "hugo-grapes"
 enableEmoji = true
@@ -17,3 +18,5 @@ enableEmoji = true
 
 [params]
 avatar = "img/grapes.svg"
+mathjax = true
+disqusURL= "https://statsjoke.me"
