@@ -1,6 +1,6 @@
 baseurl = "https://statsjoke.me"
 languageCode = "en-us"
-disqusShortname = "bianbeilei"
+disqusShortname = "bblstats"
 title = "Home"
 theme = "hugo-grapes"
 enableEmoji = true
