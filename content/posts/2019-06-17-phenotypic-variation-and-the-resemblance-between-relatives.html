@@ -1,0 +1,169 @@
+---
+title: Phenotypic Variation and the Resemblance Between Relatives
+author: Beilei
+date: '2019-06-17'
+slug: phenotypic-variation-and-the-resemblance-between-relatives
+categories: []
+tags: []
+---
+
+
+
+<div id="covariance-regression-and-correlation" class="section level3">
+<h3>Covariance, Regression, and Correlation</h3>
+<ul>
+<li><p>Covariance Consider a set of paired variables, <span class="math inline">\((x,y)\)</span>. The <strong>Covariance</strong> of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> is: <span class="math display">\[\sigma(x,y)=E[(x-\mu_x)(y-\mu_y)]=E(xy)-\mu_x\mu_y\]</span></p></li>
+<li><p>Regression <span class="math display">\[y=\alpha+\beta x+e\]</span> <span class="math display">\[\hat y=\alpha+\beta x\]</span></p></li>
+</ul>
+<p><span class="math display">\[a=\bar y-b\bar x\]</span></p>
+<p><span class="math display">\[b=\frac{Cov(x,y)}{Var(x)}\]</span> The least-squares estimators for the intercept and slope of a linear regression are simple functions of the observed means, variances, and covariances. This property is exceedingly useful for quantitative genetics, since such statistics are readily obtainable from phenotypic data.</p>
+<pre class="r"><code>data(women)
+cov(women$height, women$weight)</code></pre>
+<pre><code>## [1] 69</code></pre>
+<pre class="r"><code>fit &lt;- lm(weight~height, data = women)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = weight ~ height, data = women)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.7333 -1.1333 -0.3833  0.7417  3.1167 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -87.51667    5.93694  -14.74 1.71e-09 ***
+## height        3.45000    0.09114   37.85 1.09e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.525 on 13 degrees of freedom
+## Multiple R-squared:  0.991,  Adjusted R-squared:  0.9903 
+## F-statistic:  1433 on 1 and 13 DF,  p-value: 1.091e-14</code></pre>
+<pre class="r"><code>plot(women$weight~women$height, xlab=&#39;height&#39;, ylab=&#39;weight&#39;)
+abline(lm(weight ~ height, data = women))</code></pre>
+<p><img src="/posts/2019-06-17-phenotypic-variation-and-the-resemblance-between-relatives_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<ul>
+<li>Correlation</li>
+</ul>
+<p><span class="math display">\[r(x,y)=\frac{Cov(x,y)}{\sqrt{Var(x)Var(y)}}\]</span></p>
+<ul>
+<li><p>The correlation between genotypic and phenotypic values <span class="math display">\[z=G+E\]</span> <span class="math inline">\(z\)</span> is the phenotypic value, <span class="math inline">\(G\)</span> is the genotypic value, and <span class="math inline">\(E\)</span> is an environmental deviation(residual error) <span class="math display">\[\sigma_{z,G}=\sigma[(G+E),G]=\sigma_G^2+\sigma_{G,E}\]</span> correlation coefficient is <span class="math display">\[\rho^2(G,z)=(\frac{\sigma_{G,z}}{\sigma_G\sigma_z})^2=\frac{(\sigma^2_G+\sigma_{G,E})^2}{\sigma^2_G\sigma^2_z}\]</span> which simplifies to <span class="math display">\[\rho^2(G,z)=\frac{\sigma^2_G}{\sigma^2_z}\]</span> if there is no genotype-environment covariance. The quantity <span class="math inline">\(\sigma^2_G/\sigma^2_z\)</span> is generally referred to as heritability in the <strong>broad sense</strong>.</p></li>
+<li><p>Regression of offspring phenotype on midparent phenotype</p></li>
+</ul>
+<p>We can estimate the <strong>narrow-sense heritability</strong> through the regression of child’s phenotype on the parental mid-point phenotype. <strong>Related individuals carry copies of many of the same alleles.</strong> <span class="math display">\[z_{mp}=\frac{z_m+z_f}{2}\]</span> <span class="math display">\[z_m=g_m+g_m^{&#39;}+E_m\]</span> <span class="math display">\[z_f=g_f+g_f^{&#39;}+E_f\]</span> <span class="math display">\[z_o=g_m+g_f+E_o\]</span> <span class="math display">\[\sigma(z_{mp},z_0)=\sigma[(\frac{z_m+z_f}{2}),z_o]=\sigma[(\frac{g_m+g_f}{2}),(g_m+g_f)]=\frac{\sigma^2(g_m)+\sigma^2(g_f)}{2}\]</span> <strong>additive genetic variance, <span class="math inline">\(\sigma^2_A\)</span></strong> <span class="math display">\[\sigma(z_{mp},z_o)=\frac{\sigma^2_A}{2}\]</span> variance of midparent phenotypes: <span class="math display">\[\sigma^2(z_{mp})=\sigma^2(\frac{z_m+z_f}{2})=\frac{\sigma^2(z_m)+\sigma^2(z_f)}{4}\]</span> If the phenotypic variance in the two sexes is equal <span class="math display">\[\sigma^2(z_{mp})=\frac{\sigma^2_z}{2}\]</span> <span class="math display">\[\beta_{o,mp}=\frac{\sigma^2_A}{\sigma^2_z}=h^2\]</span></p>
+<pre class="r"><code># a simulation study
+par.off.corr&lt;-function(L=20, environ.var,Num_inds=1000,print.slope=FALSE,sel.cutoff=FALSE){
+    ##Quantitative genetics sims
+    allele.freq&lt;-0.5   ###each locus is assumed to have the same allele frequencies. This is just to simplify the coding, in reality these results work when each locus has its own frequency (and the coding wouldn&#39;t be too much harder). 
+     
+     
+    
+    ##MAKE A MUM
+    ## For each mother, at each locus we draw an allele (either 0 or 1) from the population allele frequency. 
+    ##We do this twice for each mother two represent the two haplotypes in the mother 
+    mum.hap.1&lt;-replicate(Num_inds, rbinom(L,1,allele.freq) )
+    mum.hap.2&lt;-replicate(Num_inds, rbinom(L,1,allele.freq) )
+    ##type mum.hap.1[,1] to see the 1st mothers 1st haplotype
+    
+    ##Each mothers genotype at each locus is either 0,1,2
+    mum.geno&lt;-mum.hap.1+mum.hap.2
+    
+    additive.genetic&lt;-colSums(mum.geno)
+    genetic.sd&lt;-sd(additive.genetic)
+    mean.genetic&lt;-mean(additive.genetic)
+    
+    additive.genetic&lt;-additive.genetic / sd(additive.genetic)
+    mum.pheno&lt;- additive.genetic + rnorm(Num_inds,sd=sqrt(environ.var))
+    mum.pheno&lt;-mum.pheno-mean(mum.pheno)
+    
+    
+    
+    ##MAKE A DAD (same code as make a mum, only said in a deeper voice)
+    dad.hap.1&lt;-replicate(Num_inds, rbinom(L,1,allele.freq) )
+    dad.hap.2&lt;-replicate(Num_inds, rbinom(L,1,allele.freq) )
+    dad.geno&lt;-dad.hap.1+dad.hap.2
+    
+    
+    additive.genetic&lt;-colSums(dad.geno)
+    additive.genetic&lt;-additive.genetic / sd(additive.genetic)
+    dad.pheno&lt;- additive.genetic + rnorm(Num_inds,sd=sqrt(environ.var))
+    dad.pheno&lt;-dad.pheno-mean(dad.pheno)
+    
+    ### Make a child
+    child.geno&lt;-dad.hap.1+mum.hap.1 ##1 haplotype from mum 1 haplotype from dad
+    
+    additive.genetic&lt;-colSums(child.geno)
+    additive.genetic&lt;-additive.genetic / sd(additive.genetic)
+    child.pheno&lt;- additive.genetic + rnorm(Num_inds,sd=sqrt(environ.var))
+    child.pheno&lt;-child.pheno-mean(child.pheno)
+    
+    
+    
+    ##Calculate midpoints, linear model and plots
+    
+    parental.midpoint&lt;-(mum.pheno+dad.pheno)/2 ##avg. parents
+    
+    lm(child.pheno~parental.midpoint) ##linear model between child and mid point
+                                ##the slope of this line is the narrow sense heritability.
+    
+    # plot parental midpoint against offsprings phenotype.
+    #layout(1) ###done in case this is run after the code with 3 plots
+    if(sel.cutoff){
+        plot(parental.midpoint,child.pheno,xlab=&quot;Parental midpoint&quot;,ylab=&quot;Child&#39;s phenotype&quot;,cex=1.5,cex.axis=1.5,cex.main=1.5,cex.lab=1.5,main=paste(&quot;VE=&quot;,environ.var,&quot;, VA=1 &quot;,&quot;(L =&quot;,L,&quot;)&quot;,sep=&quot;&quot;),col=ifelse(parental.midpoint&gt;1,&quot;red&quot;,&quot;grey&quot;))
+    }else{
+        plot(parental.midpoint,child.pheno,xlab=&quot;Parental midpoint&quot;,ylab=&quot;Child&#39;s phenotype&quot;,cex=1.5,cex.axis=1.5,cex.main=1.5,cex.lab=1.5,main=paste(&quot;VE=&quot;,environ.var,&quot;, VA=1 &quot;,&quot;(L =&quot;,L,&quot;)&quot;,sep=&quot;&quot;))
+    }
+    ## plot the regression in red
+    abline(h=0,col=&quot;grey&quot;,lwd=2)
+    abline(v=0,col=&quot;grey&quot;,lwd=2)
+     abline(lm(child.pheno~parental.midpoint),col=&quot;blue&quot;,lwd=2)
+    
+    
+    
+    my.slope&lt;-lm(child.pheno~parental.midpoint)$coeff[2]
+    
+    if(sel.cutoff){
+        sel.child.mean&lt;-mean(child.pheno[parental.midpoint&gt;1])
+        sel.par.mean&lt;-mean(parental.midpoint[parental.midpoint&gt;1]);
+        points(sel.par.mean,0,col=&quot;blue&quot;,pch=19,cex=1.2)
+        pred.sel.child&lt;-my.slope*sel.par.mean
+        points(0,pred.sel.child,col=&quot;blue&quot;,pch=19,cex=1.2)
+        lines(c(0,sel.par.mean), rep(pred.sel.child,2),col=&quot;blue&quot;,lwd=2)
+        lines(rep(sel.par.mean,2), c(0,pred.sel.child),col=&quot;blue&quot;,lwd=2)
+        arrows(x0=0,x1=0,y0=0,y1=pred.sel.child,col=&quot;blue&quot;,lwd=2,length=0.1,code=3)
+        arrows(x0=0,x1=sel.par.mean,y0=0,y1=0,col=&quot;blue&quot;,lwd=2,length=0.1,code=3)
+        text(x=sel.par.mean/2,y=min(child.pheno)*0.06,&quot;S&quot;,cex=1.5,col=&quot;blue&quot;)
+        text(x=min(parental.midpoint)*0.06,y=pred.sel.child/2,&quot;R&quot;,cex=1.5,col=&quot;blue&quot;)
+    }
+    
+    if(print.slope) text(x=min(parental.midpoint)*.8,y=max(child.pheno)*.9,label=paste(&quot;slope= &quot;,format(my.slope,digit=3)),col=&quot;red&quot;,lwd=4,cex=1.5)
+    
+    abline(0,1,col=&quot;red&quot;,lwd=3,lty=2)
+ #  recover()
+ }
+ 
+
+layout(t(1:3))
+par.off.corr(L=100, environ.var=100,Num_inds=500)  #,print.slope=TRUE)
+par.off.corr(L=100, environ.var=1,Num_inds=500) #,print.slope=TRUE)
+par.off.corr(L=100, environ.var=0.001,Num_inds=500) #,print.slope=TRUE)</code></pre>
+<p><img src="/posts/2019-06-17-phenotypic-variation-and-the-resemblance-between-relatives_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<ul>
+<li>Directional selection differentials and the Robertson-Price Identity</li>
+</ul>
+<p>The evolutionary response of a character to selection is a function of the intensity of selection and the fraction of the phenotypic variance attributable to certain genetic effects.</p>
+<p>Directional selection differential, <span class="math inline">\(S\)</span> <span class="math display">\[S=\mu_s-\mu\]</span> The degree to which <span class="math inline">\(\mu_s\)</span> deviates from <span class="math inline">\(\mu\)</span> depends on the survivorship and reproductive rates of individuals with different phenotypes. If all individuals have equal fertility and viability, then <span class="math inline">\(\mu_s=\mu, S=0\)</span>, and the population mean phenotype is not expected to change between generations.</p>
+<p>Fitness, <span class="math inline">\(W(z)\)</span> is the probability that individuals with phenotype <span class="math inline">\(z\)</span> survive to reproduce.</p>
+<p>Probability density function after selection: <span class="math display">\[p_s(z)=\frac{W(z)p(z)}{\int W(z)p(z)dz}\]</span> The denominator is the <strong>mean individual fitness</strong>, <span class="math inline">\(\bar{W}\)</span>. Letting the relative fitness of phenotype <span class="math inline">\(z\)</span> be <span class="math inline">\(w(z)=W(z)/\bar{W}\)</span>, <span class="math inline">\(p_s(z)=w(z)p(z)\)</span></p>
+<p><span class="math display">\[\mu_s=\int zp_s(z)dz=\int zw(z)p(z)dz=E[zw(z)]\]</span> <span class="math display">\[\bar{w}=\int w(z)p(z)dz=\frac{1}{\bar{W}}\int W(z)p(z)dz=\bar{W}/\bar{W}=1\]</span> since <span class="math inline">\(\mu=E(z)*E(w)=E(z)*1\)</span>, <span class="math display">\[S=\mu_s-\mu=E[zw(z)]-E(z)E(w)=\sigma[zw(z)]-E(z)E(w)=\sigma[z,w(z)]\]</span></p>
+<ul>
+<li>Robertson-Price identity</li>
+</ul>
+<p><strong>breeder’s equation</strong>: predictive eqution for evolutionary change across generations <span class="math display">\[\Delta \mu=\mu_o-\mu=\beta(\mu_s-\mu)=\beta S\]</span></p>
+<p><strong>Reference</strong></p>
+<ul>
+<li><a href="https://github.com/cooplab/popgen-notes/blob/master/Rcode/Quant_gen/QT2.R" class="uri">https://github.com/cooplab/popgen-notes/blob/master/Rcode/Quant_gen/QT2.R</a></li>
+<li>Lynch M, Walsh B. Genetics and analysis of quantitative traits. Sunderland, MA:Sinauer; 1998 Jan.</li>
+</ul>
+</div>
