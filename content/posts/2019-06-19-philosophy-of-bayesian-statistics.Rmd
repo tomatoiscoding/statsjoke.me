@@ -1,0 +1,120 @@
+---
+title: Philosophy of Bayesian Statistics
+author: ''
+date: '2019-06-19'
+slug: philosophy-of-bayesian-statistics
+categories: []
+tags: []
+---
+
+- Confident
+- uncertainty
+- believability
+
+Frequentist, assume that probability is the long-run frequency of events. Bayesians interpret a probability as measure of *belief*, or confidence, of an event occurring.
+
+We denote our belief about event $A$ as $P(A)$. We call this quantity the *prior probability*.
+
+"When the facts change, I change my mind."---John Maynard Keynes
+
+Bayesian updates his or her belief after seeing evidence.
+
+We denote our updated belief as $P(A|X)$, interpreted as the probability of $A$ given the evidence $X$. We call the updated belief the *posterior probability* so as to contrast it with the prior probability. We re-weighted the prior to incorporate the new evidence (i.e. we put more weight, or confidence, on some beliefs versus others).
+
+#### Bayes' Theorem
+
+$$P(A|X)=\frac{P(X|A)P(A)}{P(X)}$$
+
+#### Review of Binomial Distribution and Beta Distribution
+
+- *Bernoulli distribution*
+
+$$f(x)=p^x(1-p)^{1-x}$$
+
+- *Binomial pdf*
+
+$$f(x)=\lgroup ^n_x \rgroup p^x(1-p)^{n-x}$$
+
+- *Beta pdf*
+
+$$g(p)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}p^{a-1}(1-p)^{b-1}$$
+
+Below we plot a sequence of updating posterior probabilities as we observe increasing amounts of data (coin flips).
+
+```{r}
+set.seed(1234)
+n_trials <- c(0, 1, 2, 3, 4, 5, 8, 15, 50, 500)
+data <- rbinom(n_trials[length(n_trials)], 1, 0.5)
+x <- seq(0, 1, length.out=100)
+par(mfrow=c(1, 2))
+for (N in n_trials) {
+    heads <- sum(data[1:N])
+    y <- dbeta(x, 1+heads, 1+N-heads)
+    plot(x, y, type = 'l', col='blue')
+    legend('topright', sprintf("observe %d tosses,\n %d heads", N, heads), bg='transparent', box.lty=0)
+    abline(v=0.5, col="red", lty=2, lwd=1)
+}
+```
+
+As more data accumulates, we would see more and more probability being assigned at $p=0.5$, though never all of it.
+
+#### A Simple Bayesian Inference
+
+- prior probability: $P(A)=p$
+- posterior probability: $P(A|X)$
+- $P(X|A)$
+- $P(X)$
+
+$$P(X)=P(X and A) + P(X and \sim A)=P(X|A)P(A)+P(X|\sim A)P(\sim A)=P(X|A)p+P(X|\sim A)(1-p)$$
+
+Assume $P(X|\sim A)=0.5$, then
+
+$$P(A|X)=\frac{1\cdot p}{1\cdot p+0.5(1-p)}=\frac{2p}{1+p}$$
+
+```{r}
+p <- seq(0, 1, length.out = 50)
+plot(p, 2*p/(1+p),col='blue',type='l',xlab = 'Prior',ylab = 'Posterior')
+```
+
+#### Poisson Distribution
+
+- *probability mass function*
+
+$$Z\sim Poi(\lambda)$$
+
+$$P(Z=k)=\frac{\lambda^ke^{-\lambda}}{k!}, k=0,1,2,...$$
+
+$$E(Z|\lambda)=\lambda$$
+
+```{r}
+a <- 0:15
+lambda <- c(1.5, 4.25)
+barplot(dpois(a, lambda[1]), names.arg = a, col = '#348ABD')
+barplot(dpois(a, lambda[2]), names.arg = a, col = '#A60628', add = T)
+legend('topright', c('lambda=1.5', 'lambda=4.25'), fill = c('#348ABD', '#A60628'))
+```
+
+By increasing $\lambda$, we add more probability of larger values occurring.
+
+#### Exponential Distribution
+
+- *probability density function*
+
+$$Z\sim Exp(\lambda)$$
+$$f_Z(z|\lambda)=\lambda e^{-\lambda z}, z\geqslant0$$
+
+$$E(Z|\lambda)=\frac{1}{\lambda}$$
+
+```{r}
+a <- seq(0, 4, length.out = 100)
+lambda <- c(0.5, 1)
+plot(a, dexp(a, 0.5), col='#348ABD', type = 'l', xlab = 'z', ylab = 'PDF at z', ylim = c(0,1))
+lines(a, dexp(a, 1), col='#A60628')
+```
+
+#### What is $\lambda$?
+
+We can estimate the probability distribution for $\lambda$ with Bayesian inference.
+
+#### Reference
+- [Bayesian Methods for Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers)

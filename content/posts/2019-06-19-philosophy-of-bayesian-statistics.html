@@ -1,0 +1,109 @@
+---
+title: Philosophy of Bayesian Statistics
+author: ''
+date: '2019-06-19'
+slug: philosophy-of-bayesian-statistics
+categories: []
+tags: []
+---
+
+
+
+<ul>
+<li>Confident</li>
+<li>uncertainty</li>
+<li>believability</li>
+</ul>
+<p>Frequentist, assume that probability is the long-run frequency of events. Bayesians interpret a probability as measure of <em>belief</em>, or confidence, of an event occurring.</p>
+<p>We denote our belief about event <span class="math inline">\(A\)</span> as <span class="math inline">\(P(A)\)</span>. We call this quantity the <em>prior probability</em>.</p>
+<p>“When the facts change, I change my mind.”—John Maynard Keynes</p>
+<p>Bayesian updates his or her belief after seeing evidence.</p>
+<p>We denote our updated belief as <span class="math inline">\(P(A|X)\)</span>, interpreted as the probability of <span class="math inline">\(A\)</span> given the evidence <span class="math inline">\(X\)</span>. We call the updated belief the <em>posterior probability</em> so as to contrast it with the prior probability. We re-weighted the prior to incorporate the new evidence (i.e. we put more weight, or confidence, on some beliefs versus others).</p>
+<div id="bayes-theorem" class="section level4">
+<h4>Bayes’ Theorem</h4>
+<p><span class="math display">\[P(A|X)=\frac{P(X|A)P(A)}{P(X)}\]</span></p>
+</div>
+<div id="review-of-binomial-distribution-and-beta-distribution" class="section level4">
+<h4>Review of Binomial Distribution and Beta Distribution</h4>
+<ul>
+<li><em>Bernoulli distribution</em></li>
+</ul>
+<p><span class="math display">\[f(x)=p^x(1-p)^{1-x}\]</span></p>
+<ul>
+<li><em>Binomial pdf</em></li>
+</ul>
+<p><span class="math display">\[f(x)=\lgroup ^n_x \rgroup p^x(1-p)^{n-x}\]</span></p>
+<ul>
+<li><em>Beta pdf</em></li>
+</ul>
+<p><span class="math display">\[g(p)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}p^{a-1}(1-p)^{b-1}\]</span></p>
+<p>Below we plot a sequence of updating posterior probabilities as we observe increasing amounts of data (coin flips).</p>
+<pre class="r"><code>set.seed(1234)
+n_trials &lt;- c(0, 1, 2, 3, 4, 5, 8, 15, 50, 500)
+data &lt;- rbinom(n_trials[length(n_trials)], 1, 0.5)
+x &lt;- seq(0, 1, length.out=100)
+par(mfrow=c(1, 2))
+for (N in n_trials) {
+    heads &lt;- sum(data[1:N])
+    y &lt;- dbeta(x, 1+heads, 1+N-heads)
+    plot(x, y, type = &#39;l&#39;, col=&#39;blue&#39;)
+    legend(&#39;topright&#39;, sprintf(&quot;observe %d tosses,\n %d heads&quot;, N, heads), bg=&#39;transparent&#39;, box.lty=0)
+    abline(v=0.5, col=&quot;red&quot;, lty=2, lwd=1)
+}</code></pre>
+<p><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-1-1.png" width="672" /><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-1-2.png" width="672" /><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-1-3.png" width="672" /><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-1-4.png" width="672" /><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-1-5.png" width="672" /></p>
+<p>As more data accumulates, we would see more and more probability being assigned at <span class="math inline">\(p=0.5\)</span>, though never all of it.</p>
+</div>
+<div id="a-simple-bayesian-inference" class="section level4">
+<h4>A Simple Bayesian Inference</h4>
+<ul>
+<li>prior probability: <span class="math inline">\(P(A)=p\)</span></li>
+<li>posterior probability: <span class="math inline">\(P(A|X)\)</span></li>
+<li><span class="math inline">\(P(X|A)\)</span></li>
+<li><span class="math inline">\(P(X)\)</span></li>
+</ul>
+<p><span class="math display">\[P(X)=P(X and A) + P(X and \sim A)=P(X|A)P(A)+P(X|\sim A)P(\sim A)=P(X|A)p+P(X|\sim A)(1-p)\]</span></p>
+<p>Assume <span class="math inline">\(P(X|\sim A)=0.5\)</span>, then</p>
+<p><span class="math display">\[P(A|X)=\frac{1\cdot p}{1\cdot p+0.5(1-p)}=\frac{2p}{1+p}\]</span></p>
+<pre class="r"><code>p &lt;- seq(0, 1, length.out = 50)
+plot(p, 2*p/(1+p),col=&#39;blue&#39;,type=&#39;l&#39;,xlab = &#39;Prior&#39;,ylab = &#39;Posterior&#39;)</code></pre>
+<p><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="poisson-distribution" class="section level4">
+<h4>Poisson Distribution</h4>
+<ul>
+<li><em>probability mass function</em></li>
+</ul>
+<p><span class="math display">\[Z\sim Poi(\lambda)\]</span></p>
+<p><span class="math display">\[P(Z=k)=\frac{\lambda^ke^{-\lambda}}{k!}, k=0,1,2,...\]</span></p>
+<p><span class="math display">\[E(Z|\lambda)=\lambda\]</span></p>
+<pre class="r"><code>a &lt;- 0:15
+lambda &lt;- c(1.5, 4.25)
+barplot(dpois(a, lambda[1]), names.arg = a, col = &#39;#348ABD&#39;)
+barplot(dpois(a, lambda[2]), names.arg = a, col = &#39;#A60628&#39;, add = T)
+legend(&#39;topright&#39;, c(&#39;lambda=1.5&#39;, &#39;lambda=4.25&#39;), fill = c(&#39;#348ABD&#39;, &#39;#A60628&#39;))</code></pre>
+<p><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>By increasing <span class="math inline">\(\lambda\)</span>, we add more probability of larger values occurring.</p>
+</div>
+<div id="exponential-distribution" class="section level4">
+<h4>Exponential Distribution</h4>
+<ul>
+<li><em>probability density function</em></li>
+</ul>
+<p><span class="math display">\[Z\sim Exp(\lambda)\]</span> <span class="math display">\[f_Z(z|\lambda)=\lambda e^{-\lambda z}, z\geqslant0\]</span></p>
+<p><span class="math display">\[E(Z|\lambda)=\frac{1}{\lambda}\]</span></p>
+<pre class="r"><code>a &lt;- seq(0, 4, length.out = 100)
+lambda &lt;- c(0.5, 1)
+plot(a, dexp(a, 0.5), col=&#39;#348ABD&#39;, type = &#39;l&#39;, xlab = &#39;z&#39;, ylab = &#39;PDF at z&#39;, ylim = c(0,1))
+lines(a, dexp(a, 1), col=&#39;#A60628&#39;)</code></pre>
+<p><img src="/posts/2019-06-19-philosophy-of-bayesian-statistics_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="what-is-lambda" class="section level4">
+<h4>What is <span class="math inline">\(\lambda\)</span>?</h4>
+<p>We can estimate the probability distribution for <span class="math inline">\(\lambda\)</span> with Bayesian inference.</p>
+</div>
+<div id="reference" class="section level4">
+<h4>Reference</h4>
+<ul>
+<li><a href="https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers">Bayesian Methods for Hackers</a></li>
+</ul>
+</div>
