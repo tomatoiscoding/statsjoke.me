@@ -1,0 +1,160 @@
+---
+title: Properties of Single Locus
+author: ''
+date: '2019-07-02'
+slug: single-locus
+categories: []
+tags: []
+---
+
+
+
+<p><em>This is the notebook for chapter 4 in Genetics and Analysis of Quantitative Traits.</em></p>
+<div id="basic-definitions" class="section level3">
+<h3>Basic definitions</h3>
+<ul>
+<li>Gene</li>
+<li>Locus</li>
+<li>Alleles</li>
+<li>Sex Chromosomes</li>
+<li>Autosomes</li>
+<li>Quantitative-trait Loci (QTLs)</li>
+</ul>
+</div>
+<div id="allele-and-genotype-frequencies" class="section level3">
+<h3>Allele and genotype frequencies</h3>
+<p>Suppose <span class="math inline">\(P_{11}\)</span>, <span class="math inline">\(P_{12}\)</span>, and <span class="math inline">\(P_{22}\)</span> represent the proportions of the population that are <span class="math inline">\(B_1B_1\)</span>, <span class="math inline">\(B_1B_2\)</span>, and <span class="math inline">\(B_2B_2\)</span>. The frequency of the <span class="math inline">\(B_1\)</span> allele is</p>
+<p><span class="math display">\[p_1=\frac{2P_{11}N+P_{12}N}{2N}=P_{11}+\frac{1}{2}P_{12}\]</span></p>
+</div>
+<div id="hardy-weinberg-principle" class="section level3">
+<h3>Hardy-Weinberg Principle</h3>
+<ul>
+<li>Assumptions</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>no mutation</li>
+<li>random mating</li>
+<li>no gene flow</li>
+<li>infinite population size</li>
+<li>no selection</li>
+</ol>
+<p>Under the conditions of our idealized population, in the next generation and in all subsequent generations, the <span class="math inline">\(B_1B_1\)</span>, <span class="math inline">\(B_1B_2\)</span>, and <span class="math inline">\(B_2B_2\)</span> genotypes will be found in frequencies <span class="math inline">\(p^2_1\)</span>, <span class="math inline">\(2p_1p_2\)</span>, and <span class="math inline">\(p^2_2\)</span>.</p>
+<div id="sex-linked-loci" class="section level4">
+<h4>Sex-Linked Loci</h4>
+<p><span class="math display">\[p_1=[p_{1m}(0)+2p_{1f}(0)]/3\]</span> <span class="math display">\[p_{1m}(t)=p_{1f}(t-1)\]</span> <span class="math display">\[p_{1f}(t)=\frac{p_{1f}(t-1)+p_{1m}(t-1)}{2}\]</span></p>
+<p>general solution</p>
+<p><span class="math display">\[p_{1f}(t)-p_1=[-\frac{1}{2}]^t[p_{1f}(0)-p_1]\]</span></p>
+<p>A simulation study</p>
+<pre class="r"><code>p_1f0 &lt;- 1
+p_1m0 &lt;- 0
+generation &lt;- 0:6
+p_1 &lt;- (p_1m0 + 2*p_1f0) / 3
+p_1m &lt;- numeric(length = 7); p_1m[1] &lt;- 0
+p_1f &lt;- numeric(length = 7); p_1f[1] &lt;- 1
+for (i in 1:6) {
+    p_1f[i + 1] &lt;- (-1/2)^i * (p_1f0 - p_1) + p_1
+    p_1m[i + 1] &lt;- p_1f[i]
+}
+plot(generation, p_1m, col = &#39;red&#39;, type = &#39;l&#39;, ylab = &#39;Frequency of B1 allele&#39;, lwd = 2)
+lines(generation, p_1f, col = &#39;blue&#39;, lwd = 2)
+lines(generation, rep(p_1, 7), col = &#39;black&#39;, lty = &#39;dotted&#39;)
+text(1.5, 0.9, labels = &quot;Males&quot;)
+text(1.2, 0.45, labels = &quot;Females&quot;)</code></pre>
+<p><img src="/posts/2019-07-04-single-locus_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="testing-for-hwe" class="section level4">
+<h4>Testing for HWE</h4>
+<ul>
+<li><span class="math inline">\(\chi^2\)</span> test</li>
+<li>likelihood-ratio test</li>
+</ul>
+<pre class="r"><code>library(HardyWeinberg, quietly = T)
+x &lt;- c(MM = 298, MN = 489, NN = 213)
+HW.test &lt;- HWChisq(x, verbose = TRUE)</code></pre>
+<pre><code>## Chi-square test with continuity correction for Hardy-Weinberg equilibrium (autosomal)
+## Chi2 =  0.1789563 DF =  1 p-value =  0.6722717 D =  -3.69375 f =  0.01488253</code></pre>
+<pre class="r"><code>HW.lrtest &lt;- HWLratio(x, verbose = TRUE)</code></pre>
+<pre><code>## Likelihood ratio test for Hardy-Weinberg equilibrium
+## G2 = 0.2214663 DF = 1 p-value = 0.637925</code></pre>
+</div>
+</div>
+<div id="characterizing-the-influence-of-a-locus-on-the-phenotype" class="section level3">
+<h3>Characterizing the influence of a locus on the phenotype</h3>
+<p><span class="math display">\[z=G+E\]</span></p>
+<p>Genotypic value: <span class="math inline">\(B_1B_1=0\)</span>, <span class="math inline">\(B_1B_2=(1+k)a\)</span>, <span class="math inline">\(B_2B_2=2a\)</span></p>
+<p>If <span class="math inline">\(k&gt;1\)</span>, <strong>overdominance</strong>, <span class="math inline">\(k&lt;-1\)</span>, <strong>underdominance</strong></p>
+<div id="dominance" class="section level4">
+<h4>Dominance</h4>
+</div>
+</div>
+<div id="fishers-decomposition-of-the-genotypic-value" class="section level3">
+<h3>Fisher’s decomposition of the genotypic value</h3>
+<p>The number of copies of a particular allele in a genotype is referred to as the <strong>gene content</strong>.</p>
+<p><span class="math display">\[G_{ij}=\hat{G_{ij}}+\delta_{ij}=\mu_G+\alpha_1N_1+\alpha_2N_2+\delta_{ij}\]</span> <span class="math display">\[G_{ij}=\mu_G+\alpha_1(2-N_2)+\alpha_2N_2+\delta_{ij}=\iota+(\alpha_2-\alpha_1)N_2+\delta_{ij}\]</span></p>
+<p><span class="math inline">\(\iota=\mu_G+2\alpha_1\)</span> is the intercept, the slope is <span class="math inline">\(\alpha=\alpha_2-\alpha_1\)</span>.</p>
+<p><span class="math display">\[\hat{G_{ij}}=\mu_G+\alpha_i+\alpha_j=\begin{cases}
+\mu_G+2\alpha_1, for G_{11}\\
+\mu_G+\alpha_1+\alpha_2, for G_{21}\\
+\mu_G+2\alpha_2, for G_{22}
+\end{cases}\]</span></p>
+<p><span class="math display">\[\mu_G=\mu_G+\alpha_1E(N_1)+\alpha_2E(N_2)+0\]</span> <span class="math display">\[p_1\alpha_1+p_2\alpha_2=0\]</span> <span class="math display">\[p_1+p_2=1\]</span> we obtain</p>
+<p><span class="math inline">\(\alpha_2=p_1\alpha\)</span> and <span class="math inline">\(\alpha_1=-p_2\alpha\)</span> <span class="math display">\[\alpha=\frac{\sigma(G,N_2)}{\sigma^2(N_2)}=a[1+k(p_1-p_2)]\]</span></p>
+<ul>
+<li>Explore the relationship between gene content and genotypic value with different <span class="math inline">\(p_2\)</span> and <span class="math inline">\(k\)</span></li>
+</ul>
+<pre class="r"><code>p2 &lt;- rep(c(0.5, 0.75, 0.9), 3)
+k &lt;- rep(c(0, 0.75, 2), each = 3)
+gc &lt;- c(0, 1, 2)
+# suppose a=1
+a &lt;- 1
+y &lt;- numeric(length = 3)
+par(mfrow = c(3, 3))
+for (i in 1:9) {
+    y[1] &lt;- 0
+    y[2] &lt;- a*(1+k[i])
+    y[3] &lt;- 2*a
+    plot(gc, y, pch = 20, cex = 5*c((1-p2[i])^2, 2*(1-p2[i])*p2[i], p2[i]^2), col=&#39;red&#39;, xlab = &#39;Gene Content, N&#39;, ylab = &#39;Genotypic Value, G&#39;, main = paste0(&#39;p2=&#39;, p2[i], &#39;,&#39;, &#39;k=&#39;, k[i]))
+    alpha &lt;- a*(1+k[i]*(1-2*p2[i]))
+    alpha_1 &lt;- -p2[i]*alpha
+    iota &lt;- 2*p2[i]*a*(1+(1-p2[i])*k[i])+2*alpha_1
+    y_hat &lt;- c(iota, iota+alpha, iota+2*alpha)
+    abline(lm(y_hat ~ gc))
+}</code></pre>
+<p><img src="/posts/2019-07-04-single-locus_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>For all cases when <span class="math inline">\(p_2=p_1=0.5\)</span>, the slope <span class="math inline">\(\alpha=a\)</span> regardless of the degree of dominance.</p>
+<p>Under the assumption of random mating, <span class="math inline">\(\alpha\)</span> is known as the <strong>average effect of allelic substitution</strong>.</p>
+</div>
+<div id="partitioning-the-genetic-variance" class="section level3">
+<h3>Partitioning the genetic variance</h3>
+<p><span class="math display">\[G=\hat{G}+\delta\]</span> <span class="math display">\[\sigma^2_G=\sigma^2(\hat{G}+\delta)=\sigma^2(\hat{G})+2\sigma(\hat{G},\delta)+\sigma^2(\delta)\]</span> <span class="math display">\[\sigma^2_G=\sigma^2_A+\sigma^2_D\]</span> <span class="math display">\[\sigma^2_A=E(\hat{G}^2)-\mu^2_\hat{G}=2p_1p_2\alpha^2\]</span> <span class="math display">\[\sigma^2_D=E(\delta^2)-\mu^2_\delta=(2p_1p_2ak)^2\]</span></p>
+<ul>
+<li>Explore the relationship between <span class="math inline">\(p_2\)</span> and genetic variance with different <span class="math inline">\(k\)</span></li>
+</ul>
+<pre class="r"><code>k &lt;- c(0, 1, -1, 2)
+p2 &lt;- seq(0, 1, 0.02)
+par(mfrow=c(2,2))
+t &lt;- c(&#39;Additivity: k=0&#39;,&#39;B2 dominant: k=1&#39;,&#39;B1 dominant: k=-1&#39;, &#39;Overdominance: k=2&#39;)
+for (i in 1:4) {
+    va &lt;- 2*(1-p2)*p2*(1+k[i]*(1-2*p2))^2
+    vd &lt;- (2*(1-p2)*p2*k[i])^2
+    v &lt;- va+vd
+    plot(p2, va, main = t[i], type = &#39;l&#39;, xlab = &#39;Gene frequency, p2&#39;, ylab = &#39;Genetic variance/a^2&#39;, lty = &#39;longdash&#39;, col=&#39;red&#39;)
+    lines(p2, vd, lty = &#39;dotted&#39;)
+    lines(p2, v, col=&#39;blue&#39;)
+}</code></pre>
+<p><img src="/posts/2019-07-04-single-locus_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="additive-effects-average-excesses-and-breeding-values" class="section level3">
+<h3>Additive effects, average excesses, and breeding values</h3>
+<p>One can think of <span class="math inline">\(\hat G\)</span> and <span class="math inline">\(\delta\)</span> as the heritable and nonheritable components of an individual’s genotypic value.</p>
+<ul>
+<li>Average excess <span class="math inline">\(\alpha_2^*\)</span> of allele <span class="math inline">\(B_2\)</span></li>
+</ul>
+<p><span class="math display">\[\alpha^*_2=(G_{12}P_{12|2}+G_{22}P_{22|2})-\mu_G=(G_{12}p_1+G_{22}p_2)-\mu_G\]</span></p>
+<p>Additive effects are identical to average excesses in randomly mating populations.</p>
+<ul>
+<li><p>Average effects <span class="math inline">\(\alpha_i\)</span></p></li>
+<li><p>Breeding value</p>
+<p>The sum of the additive effects of its genes.</p></li>
+</ul>
+</div>

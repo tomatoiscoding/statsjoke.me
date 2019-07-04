@@ -1,0 +1,180 @@
+---
+title: Properties of Single Locus
+author: ''
+date: '2019-07-02'
+slug: single-locus
+categories: []
+tags: []
+---
+
+*This is the notebook for chapter 4 in Genetics and Analysis of Quantitative Traits.*
+
+### Basic definitions
+- Gene
+- Locus
+- Alleles
+- Sex Chromosomes
+- Autosomes
+- Quantitative-trait Loci (QTLs)
+
+### Allele and genotype frequencies
+
+Suppose $P_{11}$, $P_{12}$, and $P_{22}$ represent the proportions of the population that are $B_1B_1$, $B_1B_2$, and $B_2B_2$. The frequency of the $B_1$ allele is
+
+$$p_1=\frac{2P_{11}N+P_{12}N}{2N}=P_{11}+\frac{1}{2}P_{12}$$
+
+### Hardy-Weinberg Principle
+
+- Assumptions
+
+1. no mutation
+2. random mating
+3. no gene flow
+4. infinite population size
+5. no selection
+
+Under the conditions of our idealized population, in the next generation and in all subsequent generations, the $B_1B_1$, $B_1B_2$, and $B_2B_2$ genotypes will be found in frequencies $p^2_1$, $2p_1p_2$, and $p^2_2$.
+
+#### Sex-Linked Loci
+
+$$p_1=[p_{1m}(0)+2p_{1f}(0)]/3$$
+$$p_{1m}(t)=p_{1f}(t-1)$$
+$$p_{1f}(t)=\frac{p_{1f}(t-1)+p_{1m}(t-1)}{2}$$
+
+general solution
+
+$$p_{1f}(t)-p_1=[-\frac{1}{2}]^t[p_{1f}(0)-p_1]$$
+
+A simulation study
+
+```{r}
+p_1f0 <- 1
+p_1m0 <- 0
+generation <- 0:6
+p_1 <- (p_1m0 + 2*p_1f0) / 3
+p_1m <- numeric(length = 7); p_1m[1] <- 0
+p_1f <- numeric(length = 7); p_1f[1] <- 1
+for (i in 1:6) {
+    p_1f[i + 1] <- (-1/2)^i * (p_1f0 - p_1) + p_1
+    p_1m[i + 1] <- p_1f[i]
+}
+plot(generation, p_1m, col = 'red', type = 'l', ylab = 'Frequency of B1 allele', lwd = 2)
+lines(generation, p_1f, col = 'blue', lwd = 2)
+lines(generation, rep(p_1, 7), col = 'black', lty = 'dotted')
+text(1.5, 0.9, labels = "Males")
+text(1.2, 0.45, labels = "Females")
+```
+
+#### Testing for HWE
+
+- $\chi^2$ test
+- likelihood-ratio test
+
+```{r message=F}
+library(HardyWeinberg, quietly = T)
+x <- c(MM = 298, MN = 489, NN = 213)
+HW.test <- HWChisq(x, verbose = TRUE)
+HW.lrtest <- HWLratio(x, verbose = TRUE)
+```
+
+### Characterizing the influence of a locus on the phenotype
+
+$$z=G+E$$
+
+Genotypic value: $B_1B_1=0$, $B_1B_2=(1+k)a$, $B_2B_2=2a$
+
+If $k>1$, **overdominance**, $k<-1$, **underdominance**
+
+#### Dominance
+
+### Fisher's decomposition of the genotypic value
+
+The number of copies of a particular allele in a genotype is referred to as the **gene content**.
+
+$$G_{ij}=\hat{G_{ij}}+\delta_{ij}=\mu_G+\alpha_1N_1+\alpha_2N_2+\delta_{ij}$$
+$$G_{ij}=\mu_G+\alpha_1(2-N_2)+\alpha_2N_2+\delta_{ij}=\iota+(\alpha_2-\alpha_1)N_2+\delta_{ij}$$
+
+$\iota=\mu_G+2\alpha_1$ is the intercept, the slope is $\alpha=\alpha_2-\alpha_1$.
+
+$$\hat{G_{ij}}=\mu_G+\alpha_i+\alpha_j=\begin{cases}
+\mu_G+2\alpha_1, for G_{11}\\
+\mu_G+\alpha_1+\alpha_2, for G_{21}\\
+\mu_G+2\alpha_2, for G_{22}
+\end{cases}$$
+
+$$\mu_G=\mu_G+\alpha_1E(N_1)+\alpha_2E(N_2)+0$$
+$$p_1\alpha_1+p_2\alpha_2=0$$
+$$p_1+p_2=1$$
+we obtain
+
+$\alpha_2=p_1\alpha$ and $\alpha_1=-p_2\alpha$
+$$\alpha=\frac{\sigma(G,N_2)}{\sigma^2(N_2)}=a[1+k(p_1-p_2)]$$
+
+- Explore the relationship between gene content and genotypic value with different $p_2$ and $k$
+
+```{r}
+p2 <- rep(c(0.5, 0.75, 0.9), 3)
+k <- rep(c(0, 0.75, 2), each = 3)
+gc <- c(0, 1, 2)
+# suppose a=1
+a <- 1
+y <- numeric(length = 3)
+par(mfrow = c(3, 3))
+for (i in 1:9) {
+    y[1] <- 0
+    y[2] <- a*(1+k[i])
+    y[3] <- 2*a
+    plot(gc, y, pch = 20, cex = 5*c((1-p2[i])^2, 2*(1-p2[i])*p2[i], p2[i]^2), col='red', xlab = 'Gene Content, N', ylab = 'Genotypic Value, G', main = paste0('p2=', p2[i], ',', 'k=', k[i]))
+    alpha <- a*(1+k[i]*(1-2*p2[i]))
+    alpha_1 <- -p2[i]*alpha
+    iota <- 2*p2[i]*a*(1+(1-p2[i])*k[i])+2*alpha_1
+    y_hat <- c(iota, iota+alpha, iota+2*alpha)
+    abline(lm(y_hat ~ gc))
+}
+```
+
+For all cases when $p_2=p_1=0.5$, the slope $\alpha=a$ regardless of the degree of dominance.
+
+Under the assumption of random mating, $\alpha$ is known as the **average effect of allelic substitution**.
+
+### Partitioning the genetic variance
+
+$$G=\hat{G}+\delta$$
+$$\sigma^2_G=\sigma^2(\hat{G}+\delta)=\sigma^2(\hat{G})+2\sigma(\hat{G},\delta)+\sigma^2(\delta)$$
+$$\sigma^2_G=\sigma^2_A+\sigma^2_D$$
+$$\sigma^2_A=E(\hat{G}^2)-\mu^2_\hat{G}=2p_1p_2\alpha^2$$
+$$\sigma^2_D=E(\delta^2)-\mu^2_\delta=(2p_1p_2ak)^2$$
+
+- Explore the relationship between $p_2$ and genetic variance with different $k$
+
+```{r}
+k <- c(0, 1, -1, 2)
+p2 <- seq(0, 1, 0.02)
+par(mfrow=c(2,2))
+t <- c('Additivity: k=0','B2 dominant: k=1','B1 dominant: k=-1', 'Overdominance: k=2')
+for (i in 1:4) {
+    va <- 2*(1-p2)*p2*(1+k[i]*(1-2*p2))^2
+    vd <- (2*(1-p2)*p2*k[i])^2
+    v <- va+vd
+    plot(p2, va, main = t[i], type = 'l', xlab = 'Gene frequency, p2', ylab = 'Genetic variance/a^2', lty = 'longdash', col='red')
+    lines(p2, vd, lty = 'dotted')
+    lines(p2, v, col='blue')
+}
+```
+
+### Additive effects, average excesses, and breeding values
+
+One can think of $\hat G$ and $\delta$ as the heritable and nonheritable components of an individual's genotypic value.
+
+- Average excess $\alpha_2^*$ of allele $B_2$
+
+$$\alpha^*_2=(G_{12}P_{12|2}+G_{22}P_{22|2})-\mu_G=(G_{12}p_1+G_{22}p_2)-\mu_G$$
+
+
+Additive effects are identical to average excesses in randomly mating populations.
+
+- Average effects $\alpha_i$
+
+- Breeding value
+
+    The sum of the additive effects of its genes.
