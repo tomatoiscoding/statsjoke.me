@@ -1,0 +1,98 @@
+---
+title: Sources of Genetic Variation
+author: ''
+date: '2019-07-19'
+slug: sources-of-genetic-variation
+categories: []
+tags: []
+---
+*This is the notebook for chapter 5 in Genetics and Analysis of Quantitative Traits.*
+
+### Epistasis
+
+**Epistasis** describes the nonadditivity of effects between loci.
+
+Consider an individual with alleles $A_i$ and $A_j$ at one locus and $B_k$ and $B_l$ at another.
+
+$$G_{ijkl}=\mu_G+(\alpha_i+\alpha_j+\delta_{ij})+(\alpha_k+\alpha_l+\delta_{kl})+\epsilon_{ijkl}$$
+
+With only two loci, there are actually three ways in which interactions can arise between loci: $additive \times additive$($\alpha\alpha$), $additive \times dominance$($\alpha\delta$), $dominance \times dominance$($\delta\delta$).
+
+### A general least-squares model for genetic effects
+
+Additive effects:
+
+$$\alpha_i=G_{i...}-\mu_G$$
+
+Dominance effects:
+
+$$\delta_{ij}=G_{ij..}-\mu_G-\alpha_i-\alpha_j$$
+$$\delta_{kl}=G_{..kl}-\mu_G-\alpha_k-\alpha_l$$
+
+$$(\alpha\alpha)_{ik}=G_{i.k.}-\mu_G-\alpha_i-\alpha_k$$
+
+$$(\alpha\delta)_{ikl}=G_{i.kl}-\mu_G-\alpha_i-\alpha_k-\alpha_l-\delta_{kl}-(\alpha\alpha)_{ik}-(\alpha\alpha)_{il}$$
+
+$$(\delta\delta)_{ijkl}=G_{ijkl}-\mu_G-\alpha_i-\alpha_j-\alpha_k-\alpha_l-\delta_{ij}-\delta{kl}-(\alpha\alpha)_{ik}-(\alpha\alpha)_{il}-(\alpha\alpha)_{jk}-(\alpha\alpha)_{jl}-(\alpha\delta)_{ikl}-(\alpha\delta)_{jkl}-(\alpha\delta)_{ijk}-(\alpha\delta)_{ijl}$$
+
+complete description of a genotypic value:
+
+$$G_{ijkl....}=\mu_G+[\alpha_i+\alpha_j+\alpha_k+\alpha_l]+[\delta_{ij}+\delta_{kl}]+[(\alpha\alpha)_{ik}+(\alpha\alpha)_{il}+(\alpha\alpha)_{jk}+(\alpha\alpha)_{jl}]+[(\alpha\delta)_{ikl}+(\alpha\delta)_{jkl}+(\alpha\delta)_{ijk}+(\alpha\delta)_{ijl}]+(\delta\delta)_{ijkl}+...$$
+
+**The mean value of each type of effect is always equal to zero.**
+
+Total genetic variance:
+
+$$\sigma^2_G=\sigma^2_A-\sigma^2_D+\sigma^2_{AA}+\sigma^2_{AD}+\sigma^2_{DD}+...$$
+
+### Linkage
+
+Genes that lie on the same chromosome tend to be inherited as a group, a tendency that declines with increasing distance between the loci. **Crossing-over** is responsible for this decline.
+
+**Coefficient of linkage disequilibrium** or **Coefficient of gametic phase disequilibrium**
+
+$$D_{A_iB_j}=P_{A_iB_j}-p_{A_i}p_{B_j}$$
+
+The expected dynamics of gametic phase disequilibrium depend on the recombination fraction between loci, *c* (0~0.5).
+
+$$P_{A_iB_j}(t+1)=(1-c)P_{A_iB_j}(t)+cp_{A_i}p_{B_j}$$
+
+$$D_{A_iB_j}(t+1)=(1-c)D_{A_iB_j}(t)$$
+
+$$D_{A_iB_j}(t)=(1-c)^tD_{A_iB_j}(0)$$
+
+```{r}
+f <- function(c, t) {
+    value <- (1-c)^t
+}
+plot(x = 0:100, y = f(0.5, 0:100), type = 'l', col = 'red', lwd = 1, xlab = 'Generation(t)', ylab = 'D(t)/D(0)')
+text(9, 0.13, 'c=0.5')
+lines(0:100, f(0.1, 0:100), col = 'blue', lwd = 1.5)
+text(22, 0.19, 'c=0.1')
+lines(0:100, f(0.01, 0:100), col = 'orange', lwd = 1.8)
+text(50, 0.68, 'c=0.01')
+lines(0:100, f(0.001, 0:100), col = 'yellow', lwd = 2)
+text(82, 0.95, 'c=0.001')
+```
+
+### Effect of disequibrium on the genetic variance
+
+- repulsion disequilibrium
+- coupling disequilibrium
+
+$$\sigma^2(x+y)=\sigma^2(x)+\sigma^2(y)+2\sigma(x,y)$$
+$$\sigma^2(\sum_i^nx_i)=\sum_i^n\sum_j^n\sigma(x_i,x_j)=\sum_i^n\sigma^2(x_i)+2\sum_{i<j}^n\sigma(x_i,x_j)$$
+
+$$\sigma^2_A=2\sum_{i=1}^{n}\alpha(i)^2p_iq_i+2\sum_{i=1}^n\sum_{j\neq i}^n\alpha(i)\alpha(j)D_{ij}$$
+$$\sigma^2_D=4\sum_{i=1}^n(a_ik_ip_iq_i)^2+4\sum_{i=1}^n\sum_{j\neq i}^na_ia_jk_ik_jD_{ij}^2$$
+
+When the **disequilibrium covariance** is negative, we refer to it as **hidden genetic variance**.
+
+#### Test for the presence of disequilibrium covariance
+
+Randomly mate a population while minimizing selection over several consecutive generations. As gametic phase equilibrium is established, the phenotypic variance should converge on the expected equilibrium variance, with the deviation between initial and final levels of expressed genetic variance providing an estimate of the disequilibrium covariance in the base population.
+
+#### The evidence
+
+- stabilizing selection
+- polygenic balance

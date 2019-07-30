@@ -1,0 +1,77 @@
+---
+title: Sources of Genetic Variation
+author: ''
+date: '2019-07-19'
+slug: sources-of-genetic-variation
+categories: []
+tags: []
+---
+
+
+
+<p><em>This is the notebook for chapter 5 in Genetics and Analysis of Quantitative Traits.</em></p>
+<div id="epistasis" class="section level3">
+<h3>Epistasis</h3>
+<p><strong>Epistasis</strong> describes the nonadditivity of effects between loci.</p>
+<p>Consider an individual with alleles <span class="math inline">\(A_i\)</span> and <span class="math inline">\(A_j\)</span> at one locus and <span class="math inline">\(B_k\)</span> and <span class="math inline">\(B_l\)</span> at another.</p>
+<p><span class="math display">\[G_{ijkl}=\mu_G+(\alpha_i+\alpha_j+\delta_{ij})+(\alpha_k+\alpha_l+\delta_{kl})+\epsilon_{ijkl}\]</span></p>
+<p>With only two loci, there are actually three ways in which interactions can arise between loci: <span class="math inline">\(additive \times additive\)</span>(<span class="math inline">\(\alpha\alpha\)</span>), <span class="math inline">\(additive \times dominance\)</span>(<span class="math inline">\(\alpha\delta\)</span>), <span class="math inline">\(dominance \times dominance\)</span>(<span class="math inline">\(\delta\delta\)</span>).</p>
+</div>
+<div id="a-general-least-squares-model-for-genetic-effects" class="section level3">
+<h3>A general least-squares model for genetic effects</h3>
+<p>Additive effects:</p>
+<p><span class="math display">\[\alpha_i=G_{i...}-\mu_G\]</span></p>
+<p>Dominance effects:</p>
+<p><span class="math display">\[\delta_{ij}=G_{ij..}-\mu_G-\alpha_i-\alpha_j\]</span> <span class="math display">\[\delta_{kl}=G_{..kl}-\mu_G-\alpha_k-\alpha_l\]</span></p>
+<p><span class="math display">\[(\alpha\alpha)_{ik}=G_{i.k.}-\mu_G-\alpha_i-\alpha_k\]</span></p>
+<p><span class="math display">\[(\alpha\delta)_{ikl}=G_{i.kl}-\mu_G-\alpha_i-\alpha_k-\alpha_l-\delta_{kl}-(\alpha\alpha)_{ik}-(\alpha\alpha)_{il}\]</span></p>
+<p><span class="math display">\[(\delta\delta)_{ijkl}=G_{ijkl}-\mu_G-\alpha_i-\alpha_j-\alpha_k-\alpha_l-\delta_{ij}-\delta{kl}-(\alpha\alpha)_{ik}-(\alpha\alpha)_{il}-(\alpha\alpha)_{jk}-(\alpha\alpha)_{jl}-(\alpha\delta)_{ikl}-(\alpha\delta)_{jkl}-(\alpha\delta)_{ijk}-(\alpha\delta)_{ijl}\]</span></p>
+<p>complete description of a genotypic value:</p>
+<p><span class="math display">\[G_{ijkl....}=\mu_G+[\alpha_i+\alpha_j+\alpha_k+\alpha_l]+[\delta_{ij}+\delta_{kl}]+[(\alpha\alpha)_{ik}+(\alpha\alpha)_{il}+(\alpha\alpha)_{jk}+(\alpha\alpha)_{jl}]+[(\alpha\delta)_{ikl}+(\alpha\delta)_{jkl}+(\alpha\delta)_{ijk}+(\alpha\delta)_{ijl}]+(\delta\delta)_{ijkl}+...\]</span></p>
+<p><strong>The mean value of each type of effect is always equal to zero.</strong></p>
+<p>Total genetic variance:</p>
+<p><span class="math display">\[\sigma^2_G=\sigma^2_A-\sigma^2_D+\sigma^2_{AA}+\sigma^2_{AD}+\sigma^2_{DD}+...\]</span></p>
+</div>
+<div id="linkage" class="section level3">
+<h3>Linkage</h3>
+<p>Genes that lie on the same chromosome tend to be inherited as a group, a tendency that declines with increasing distance between the loci. <strong>Crossing-over</strong> is responsible for this decline.</p>
+<p><strong>Coefficient of linkage disequilibrium</strong> or <strong>Coefficient of gametic phase disequilibrium</strong></p>
+<p><span class="math display">\[D_{A_iB_j}=P_{A_iB_j}-p_{A_i}p_{B_j}\]</span></p>
+<p>The expected dynamics of gametic phase disequilibrium depend on the recombination fraction between loci, <em>c</em> (0~0.5).</p>
+<p><span class="math display">\[P_{A_iB_j}(t+1)=(1-c)P_{A_iB_j}(t)+cp_{A_i}p_{B_j}\]</span></p>
+<p><span class="math display">\[D_{A_iB_j}(t+1)=(1-c)D_{A_iB_j}(t)\]</span></p>
+<p><span class="math display">\[D_{A_iB_j}(t)=(1-c)^tD_{A_iB_j}(0)\]</span></p>
+<pre class="r"><code>f &lt;- function(c, t) {
+    value &lt;- (1-c)^t
+}
+plot(x = 0:100, y = f(0.5, 0:100), type = &#39;l&#39;, col = &#39;red&#39;, lwd = 1, xlab = &#39;Generation(t)&#39;, ylab = &#39;D(t)/D(0)&#39;)
+text(9, 0.13, &#39;c=0.5&#39;)
+lines(0:100, f(0.1, 0:100), col = &#39;blue&#39;, lwd = 1.5)
+text(22, 0.19, &#39;c=0.1&#39;)
+lines(0:100, f(0.01, 0:100), col = &#39;orange&#39;, lwd = 1.8)
+text(50, 0.68, &#39;c=0.01&#39;)
+lines(0:100, f(0.001, 0:100), col = &#39;yellow&#39;, lwd = 2)
+text(82, 0.95, &#39;c=0.001&#39;)</code></pre>
+<p><img src="/posts/2019-07-19-sources-of-genetic-variation_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="effect-of-disequibrium-on-the-genetic-variance" class="section level3">
+<h3>Effect of disequibrium on the genetic variance</h3>
+<ul>
+<li>repulsion disequilibrium</li>
+<li>coupling disequilibrium</li>
+</ul>
+<p><span class="math display">\[\sigma^2(x+y)=\sigma^2(x)+\sigma^2(y)+2\sigma(x,y)\]</span> <span class="math display">\[\sigma^2(\sum_i^nx_i)=\sum_i^n\sum_j^n\sigma(x_i,x_j)=\sum_i^n\sigma^2(x_i)+2\sum_{i&lt;j}^n\sigma(x_i,x_j)\]</span></p>
+<p><span class="math display">\[\sigma^2_A=2\sum_{i=1}^{n}\alpha(i)^2p_iq_i+2\sum_{i=1}^n\sum_{j\neq i}^n\alpha(i)\alpha(j)D_{ij}\]</span> <span class="math display">\[\sigma^2_D=4\sum_{i=1}^n(a_ik_ip_iq_i)^2+4\sum_{i=1}^n\sum_{j\neq i}^na_ia_jk_ik_jD_{ij}^2\]</span></p>
+<p>When the <strong>disequilibrium covariance</strong> is negative, we refer to it as <strong>hidden genetic variance</strong>.</p>
+<div id="test-for-the-presence-of-disequilibrium-covariance" class="section level4">
+<h4>Test for the presence of disequilibrium covariance</h4>
+<p>Randomly mate a population while minimizing selection over several consecutive generations. As gametic phase equilibrium is established, the phenotypic variance should converge on the expected equilibrium variance, with the deviation between initial and final levels of expressed genetic variance providing an estimate of the disequilibrium covariance in the base population.</p>
+</div>
+<div id="the-evidence" class="section level4">
+<h4>The evidence</h4>
+<ul>
+<li>stabilizing selection</li>
+<li>polygenic balance</li>
+</ul>
+</div>
+</div>
