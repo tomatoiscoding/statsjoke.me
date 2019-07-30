@@ -43,7 +43,7 @@ $$G_{ijkl....}=\mu_G+[\alpha_i+\alpha_j+\alpha_k+\alpha_l]+[\delta_{ij}+\delta_{
 
 Total genetic variance:
 
-$$\sigma^2_G=\sigma^2_A-\sigma^2_D+\sigma^2_{AA}+\sigma^2_{AD}+\sigma^2_{DD}+...$$
+$$\sigma^2_G=\sigma^2_A+\sigma^2_D+\sigma^2_{AA}+\sigma^2_{AD}+\sigma^2_{DD}+...$$
 
 ### Linkage
 
