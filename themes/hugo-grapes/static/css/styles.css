@@ -1,7 +1,7 @@
 :root {
-	--color: #87CEFA; /*grape*/
-	--color-dark: #49274A; /*eggplant*/
-	--color-light: #F4DECB; /*sand*/
+	--color: #51247A; /*grape*/
+	--color-dark: black; /*eggplant*/
+	--color-light: white; /*sand*/
 	--color-lite: #F9F9F9;
 }
 
@@ -185,7 +185,7 @@ a {
 }
 
 .white a {
-	color: #30B200; /*Green*/
+	color: #00ab6b; /*Green*/
 }
 
 .white a:hover {
