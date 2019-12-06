@@ -28,11 +28,11 @@ disable_comments: true
 
 ### Work Experience
 
-- Data Scientist, Percent, 2017.5-2018.10
+- Data Scientist, [Percent](https://www.percent.cn/), 2017.5-2018.10
 
     I was a data scientist at Percent, a leading big data company in China. My responsibilities included developing statistical model for population projection and mastered knowledge in demography, analyzing malaria incidence dataset in Africa with spatial statistical methods. I also learned RNN, LSTM for natural language processing.
 
-- Algorithm Engineer, WeGene, 2016.6-2017.4
+- Algorithm Engineer, [WeGene](https://www.wegene.com/), 2016.6-2017.4
 
     At WeGene, the largest DTC company in China, I developed algorithm and shiny apps for ancestry analysis and optimized the efficiency of the R code. Undertook task of analyzing Axiom genotyping array data. Investigated the accuracy of APoE genotypes derived from Axiom array.
     
@@ -42,11 +42,11 @@ disable_comments: true
 
 ### Talks
 
-- Algorithm for ancestry analysis and its performance optimization ([pdf](/pdf/ChinaR2016.pdf))
+- Algorithm for ancestry analysis and its performance optimization ([slides](/pdf/ChinaR2016.pdf))
 
     Presented at the 10th China R conference. East China Normal University, Shanghai, China. December, 2016
     
-- Sentiment analysis using product review data ([pdf](/pdf/sentiment_analysis.pdf))
+- Sentiment analysis using product review data ([slides](/pdf/sentiment_analysis.pdf))
     
     Presented at R Users Group meetup. Shanghai, China. July, 2017
 
