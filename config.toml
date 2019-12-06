@@ -1,6 +1,7 @@
 baseurl = "https://statsjoke.me"
 languageCode = "en-us"
 disqusShortname = "bblstats"
+googleAnalytics= "UA-154109734-1"
 title = "Home"
 theme = "hugo-grapes"
 enableEmoji = true
@@ -10,11 +11,16 @@ enableEmoji = true
 
 [menu]
 
-  [[menu.main]]
-    identifier = "posts"
-    name = "Posts"
-    url = "/posts"
-    weight = 20
+[[menu.main]]
+identifier = "posts"
+name = "Posts"
+url = "/posts"
+weight = 1
+
+[[menu.main]]
+name = "CV"
+url = "/CV/"
+weight = 2
 
 [params]
 avatar = "img/grapes.svg"
