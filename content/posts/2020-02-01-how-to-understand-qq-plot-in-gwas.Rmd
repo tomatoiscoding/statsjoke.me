@@ -1,0 +1,52 @@
+---
+title: How to understand QQ plot in GWAS
+author: Beilei
+date: '2020-02-10'
+slug: how-to-understand-qq-plot-in-gwas
+categories: []
+tags: []
+---
+
+QQ plot is an essential tool in GWAS. Here I would like to organize some basic ideas of QQ plot and its application in GWAS.
+
+### What is QQ plot?
+
+QQ plot is a graphic tool for testing if a set of data came from some theoretical distribution.
+
+### Examples in R
+
+- `qqnorm`
+
+    Test if a set of data comes from normal distribution.
+    In R,
+    ```{r}
+    qqnorm(trees$Height)
+    ```
+    
+- `qqplot`
+
+    Create a QQ plot for any distribution. In R,
+    ```{r}
+    y <- qunif(ppoints(length(randu$x)))
+    qqplot(randu$x,y)
+    qqplot(qnorm(ppoints(30)), qchisq(ppoints(30),df=3))
+    qqplot(qnorm(ppoints(30)), qcauchy(ppoints(30)))
+    ```
+    
+### QQ plot in GWAS
+
+Plot quantile distribution of observed p-values (on the y-axis) versus the quantile distribution of expected p-values(uniform distribution)
+
+- null GWAS: straight line
+- strong association: a line with a tail
+
+```{r}
+library(data.table)
+pvals <- fread('https://broadinstitute.org/files/shared/diabetes/scandinavs/DGI_chr3_pvals.txt')
+observed <- sort(pvals$PVAL)
+lobs <- -(log10(observed))
+expected <- c(1:length(observed))
+lexp <- -(log10(expected / (length(expected)+1)))
+plot(c(0, 7), c(0, 7), col = 'red', lwd = 3, type = 'l', xlab = 'Expected (-logP)', ylab = 'Observed (-logP)', xlim = c(0, 7), ylim = c(0, 7), las = 1, xaxs = 'i', yaxs = 'i', bty = 'l')
+points(lexp, lobs, pch = 23, cex = .4, bg = 'black')
+```

@@ -1,0 +1,51 @@
+---
+title: How to understand QQ plot in GWAS
+author: Beilei
+date: '2020-02-10'
+slug: how-to-understand-qq-plot-in-gwas
+categories: []
+tags: []
+---
+
+
+
+<p>QQ plot is an essential tool in GWAS. Here I would like to organize some basic ideas of QQ plot and its application in GWAS.</p>
+<div id="what-is-qq-plot" class="section level3">
+<h3>What is QQ plot?</h3>
+<p>QQ plot is a graphic tool for testing if a set of data came from some theoretical distribution.</p>
+</div>
+<div id="examples-in-r" class="section level3">
+<h3>Examples in R</h3>
+<ul>
+<li><p><code>qqnorm</code></p>
+<p>Test if a set of data comes from normal distribution. In R,</p>
+<pre class="r"><code>qqnorm(trees$Height)</code></pre>
+<p><img src="/posts/2020-02-01-how-to-understand-qq-plot-in-gwas_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p></li>
+<li><p><code>qqplot</code></p>
+<p>Create a QQ plot for any distribution. In R,</p>
+<pre class="r"><code>y &lt;- qunif(ppoints(length(randu$x)))
+qqplot(randu$x,y)</code></pre>
+<p><img src="/posts/2020-02-01-how-to-understand-qq-plot-in-gwas_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>qqplot(qnorm(ppoints(30)), qchisq(ppoints(30),df=3))</code></pre>
+<p><img src="/posts/2020-02-01-how-to-understand-qq-plot-in-gwas_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>qqplot(qnorm(ppoints(30)), qcauchy(ppoints(30)))</code></pre>
+<p><img src="/posts/2020-02-01-how-to-understand-qq-plot-in-gwas_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p></li>
+</ul>
+</div>
+<div id="qq-plot-in-gwas" class="section level3">
+<h3>QQ plot in GWAS</h3>
+<p>Plot quantile distribution of observed p-values (on the y-axis) versus the quantile distribution of expected p-values(uniform distribution)</p>
+<ul>
+<li>null GWAS: straight line</li>
+<li>strong association: a line with a tail</li>
+</ul>
+<pre class="r"><code>library(data.table)
+pvals &lt;- fread(&#39;https://broadinstitute.org/files/shared/diabetes/scandinavs/DGI_chr3_pvals.txt&#39;)
+observed &lt;- sort(pvals$PVAL)
+lobs &lt;- -(log10(observed))
+expected &lt;- c(1:length(observed))
+lexp &lt;- -(log10(expected / (length(expected)+1)))
+plot(c(0, 7), c(0, 7), col = &#39;red&#39;, lwd = 3, type = &#39;l&#39;, xlab = &#39;Expected (-logP)&#39;, ylab = &#39;Observed (-logP)&#39;, xlim = c(0, 7), ylim = c(0, 7), las = 1, xaxs = &#39;i&#39;, yaxs = &#39;i&#39;, bty = &#39;l&#39;)
+points(lexp, lobs, pch = 23, cex = .4, bg = &#39;black&#39;)</code></pre>
+<p><img src="/posts/2020-02-01-how-to-understand-qq-plot-in-gwas_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
